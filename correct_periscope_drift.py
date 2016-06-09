@@ -151,7 +151,7 @@ def display_start_info(opts):
     v2("  verbose={0}".format(opts["verbose"]))
     v2("  and CALDB is set to  {0}".format(os.environ["CALDB"]))
     v2("  and ASCDS_INSTALL is {0}".format(os.environ["ASCDS_INSTALL"]))
-
+    v2("-" * 60)
 
 
 def equatorial2transform(ra, dec, roll):
@@ -288,6 +288,7 @@ def fit(fit_data, evt_times, data_id, opt):
     ui.clean()
     ui.load_arrays(data_id, evt_times - evt_times[0], fit_data,
                    np.zeros_like(fit_data) + init_error)
+    v2("Fitting a line to the data to get reduced stat errors")
     # First just fit a line to get reduced errors on this set
     ui.polynom1d.line
     ui.set_model(data_id, 'line')
@@ -297,6 +298,7 @@ def fit(fit_data, evt_times, data_id, opt):
     calc_error = init_error * np.sqrt(fit.rstat)
     ui.set_staterror(data_id, calc_error)
     # Then fit the specified model
+    v2("Fitting a polynomial of degree {} to the data".format(opt['corr_poly_degree']))
     ui.polynom1d.fitpoly
     ui.freeze('fitpoly')
     # Thaw the coefficients requested by the degree of the desired polynomial
@@ -347,6 +349,10 @@ def main(opt):
     ax_data['yag'], ax_data['zag'] = get_event_yag_zag(evt_ra, evt_dec,
                                                        evt_ra_nom, evt_dec_nom, evt_roll_nom)
 
+    # Store comments to print in block after all of the sherpa fit output
+    fit_comments = []
+    plot_list = []
+
     for data_id, ax in enumerate(['yag', 'zag']):
         fit_data = ax_data[ax] - np.mean(ax_data[ax])
         mp = fit(fit_data, evt_times, data_id, opt)
@@ -363,6 +369,7 @@ def main(opt):
         fit_plot = "{}_fit_{}.png".format(opt['corr_plot_prefix'], ax)
         if os.path.exists(fit_plot) and opt['clobber']:
             os.unlink(fit_plot)
+        plot_list.append(fit_plot)
         print_window(fit_plot)
 
         add_window()
@@ -373,17 +380,27 @@ def main(opt):
         set_plot_xlabel("Observation elapsed/delta time (ks)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Raw data and fit in {}".format(ax))
+        plot_list.append(fit_plot)
         print_window(data_plot)
-
 
         asol_corr = np.interp(asol_times, mp.x + evt_times[0], mp.y)
         asol_col_to_fix = asol.get_column(ax_map[ax])
-        v1("Events show drift range of {:.2f} arcsec in {} axis".format(
+        fit_comments.append("Events show drift range of {:.2f} arcsec in {} axis".format(
                 np.max(asol_corr) - np.min(asol_corr), ax))
-        v1("Max absolute correction of {:.2f} arcsec for {} axis".format(
+        fit_comments.append("Max absolute correction of {:.2f} arcsec for {} axis".format(
                 np.max(np.abs(asol_corr)), ax))
 
         asol_col_to_fix.values += (asol_corr / 20)
+
+    v1("-" * 60)
+    v1("Fit results")
+    for c in fit_comments:
+        v1("\t{}".format(c))
+    v1("-" * 60)
+    v2("Writing out corrected aspect solution file to {}".format(opt['corr_asolfile']))
+    v2("\tTo review fit see correction plots in:")
+    for p in plot_list:
+        v2("\t\t{}".format(p))
 
     asol.write(opt['corr_asolfile'], clobber=opt['clobber'])
 
