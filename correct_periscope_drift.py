@@ -321,7 +321,7 @@ def fit(fit_data, evt_times, data_id, opt):
 # without having to worry about them calling sys.exit.
 
 
-#@handle_ciao_errors(toolname, version)
+@handle_ciao_errors(TOOLNAME, VERSION)
 def main(opt):
     events = extract_events(opt['evt2file'],
                             opt['src_x'], opt['src_y'], opt['src_radius'])
