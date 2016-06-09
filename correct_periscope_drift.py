@@ -96,16 +96,12 @@ def process_command_line(argv):
               'parname': pinfo['parname']}
 
     for stringpar in ['evt2file', 'input_asolfile',
-                      'corr_asolfile', 'corr_plot_prefix', 'corr_method']:
+                      'corr_asolfile', 'corr_plot_prefix']:
         mypars[stringpar] = pio.pgetstr(fp, stringpar)
         if mypars[stringpar].strip() == "":
             raise ValueError("{} parameter is empty".format(stringpar))
 
-    methods = ['line', 'poly2', 'polyfree', 'smooth']
-    if mypars['corr_method'] not in methods:
-        raise ValueError("Unknown correction method {} is not in {}".format(
-                mypars['corr_method'],
-                methods))
+    mypars['corr_poly_degree'] = pio.pgeti(fp, "corr_poly_degree")
 
     for floatpar in ['src_x', 'src_y', 'src_radius', 'src_min_counts']:
         mypars[floatpar] = pio.pgetd(fp, floatpar)
@@ -301,18 +297,14 @@ def fit(fit_data, evt_times, data_id, opt):
     calc_error = init_error * np.sqrt(fit.rstat)
     ui.set_staterror(data_id, calc_error)
     # Then fit the specified model
-    if opt['corr_method'] == 'line' or opt['corr_method'] == 'smooth':
-        ui.set_model(data_id, 'line')
-    if opt['corr_method'] == 'poly2':
-        ui.polynom1d.poly2
-        ui.set_model(data_id, 'poly2')
-        ui.thaw(poly2.c1)
-        ui.thaw(poly2.c2)
-        ui.thaw(poly2.offset)
-    if opt['corr_method'] == 'polyfree':
-        ui.polynom1d.polyfree
-        ui.set_model(data_id, 'polyfree')
-        ui.thaw(polyfree)
+    ui.polynom1d.fitpoly
+    ui.freeze('fitpoly')
+    # Thaw the coefficients requested by the degree of the desired polynomial
+    for deg in range(1, 1 + opt['corr_poly_degree']):
+        ui.thaw("fitpoly.c{}".format(deg))
+    if opt['corr_poly_degree'] > 1:
+        ui.thaw('fitpoly.offset')
+    ui.set_model(data_id, 'fitpoly')
     ui.fit(data_id)
     mp = ui.get_model_plot(data_id)
     return mp

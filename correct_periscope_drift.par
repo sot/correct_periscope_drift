@@ -10,7 +10,7 @@ src_y,r,h,4071.854655,,,"src sky y"
 src_radius,r,h,6,,,"src circle radius"
 src_min_counts,r,h,250,,,"minimum src counts"
 src_roll_error,r,h,.1,,,"maximum allowed error due to roll range and src off axis angle"
-corr_method,f,h,"polyfree",,,"correction method"
+corr_poly_degree,i,h,2,1,8,"Degree of sherpa fit polynomial"
 clobber,b,h,yes,,,"Overwrite the output file if it exists?"
 verbose,i,h,5,0,5,"Debug level (0=no debug information)"
 mode,s,h,"ql",,,
