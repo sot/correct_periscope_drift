@@ -70,7 +70,7 @@ def process_command_line(argv):
     import paramio as pio
     """Handle the parameter input for this script."""
 
-    if argv == None or argv == []:
+    if argv is None or argv == []:
         raise ValueError("argv argument is None or empty")
 
     # open_param_file, from ciao_contrib.param_wrapper,
@@ -95,7 +95,7 @@ def process_command_line(argv):
     mypars = {'progname': pinfo['progname'],
               'parname': pinfo['parname']}
 
-    for stringpar in ['evt2file', 'input_asolfile',
+    for stringpar in ['evtfile', 'input_asolfile',
                       'corr_asolfile', 'corr_plot_prefix']:
         mypars[stringpar] = pio.pgetstr(fp, stringpar)
         if mypars[stringpar].strip() == "":
@@ -123,8 +123,9 @@ def process_command_line(argv):
     # match that used by CIAO tools but I have not done this.
     #
     #
-    if not clobber and os.path.exists(outfile):
-        raise IOError("clobber is no and outfile ({0}) exists".format(outfile))
+    if not clobber and os.path.exists(mypars['corr_asolfile']):
+        raise IOError("clobber is no and outfile ({0}) exists".format(
+                mypars['corr_asolfile']))
 
     mypars['clobber'] = clobber
     mypars['verbose'] = verbose
@@ -133,7 +134,6 @@ def process_command_line(argv):
     # something else, depending on the parameter file)
     #
     return mypars
-
 
 
 # Display parameter info to the user.
@@ -145,7 +145,7 @@ def display_start_info(opts):
     v1("Running: {0}".format(opts["progname"]))
     v2("  version = {0}".format(VERSION))
     v2("with parameters:")
-    v2("  evt2file={0}".format(opts["evt2file"]))
+    v2("  evtfile={0}".format(opts["evtfile"]))
     v2("  input_asolfile={0}".format(opts["input_asolfile"]))
     # probably other values here too
     v2("  verbose={0}".format(opts["verbose"]))
@@ -231,7 +231,7 @@ def get_event_yag_zag(evt_ra, evt_dec, ra_nom, dec_nom, roll_nom):
     Convert RA and Dec positions into Y and Z angle
 
     This takes the RA and Dec positions of the events and takes a "nominal" pointing
-    (which maybe taken from the nominal values provided in the EVT2 header
+    (which maybe taken from the nominal values provided in the event file header
     and uses that reference nominal pointing to convert to Y and Z angle
     that should relate to Aspect Camera Y and Z angle for the purposes of
     fitting Y and Z angle periscope drift.
@@ -280,7 +280,6 @@ def time_bins(times, x, nbins=20):
     return bin_centers, np.array(bin_x), np.array(bin_std)
 
 
-
 def fit(fit_data, evt_times, data_id, opt):
 
     init_error = 5
@@ -292,7 +291,7 @@ def fit(fit_data, evt_times, data_id, opt):
     # First just fit a line to get reduced errors on this set
     ui.polynom1d.line
     ui.set_model(data_id, 'line')
-    ui.thaw(line.c1)
+    ui.thaw('line.c1')
     ui.fit(data_id)
     fit = ui.get_fit_results()
     calc_error = init_error * np.sqrt(fit.rstat)
@@ -323,7 +322,7 @@ def fit(fit_data, evt_times, data_id, opt):
 
 @handle_ciao_errors(TOOLNAME, VERSION)
 def main(opt):
-    events = extract_events(opt['evt2file'],
+    events = extract_events(opt['evtfile'],
                             opt['src_x'], opt['src_y'], opt['src_radius'])
 
     evt_ra = events.get_column('RA').values
@@ -380,7 +379,7 @@ def main(opt):
         set_plot_xlabel("Observation elapsed/delta time (ks)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Raw data and fit in {}".format(ax))
-        plot_list.append(fit_plot)
+        plot_list.append(data_plot)
         print_window(data_plot)
 
         asol_corr = np.interp(asol_times, mp.x + evt_times[0], mp.y)
@@ -402,8 +401,8 @@ def main(opt):
     for p in plot_list:
         v2("\t\t{}".format(p))
 
+    # Actually write out the new aspect solution file
     asol.write(opt['corr_asolfile'], clobber=opt['clobber'])
-
 
 
 if __name__ == "__main__":
