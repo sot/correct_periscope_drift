@@ -23,7 +23,7 @@ To aid in determining the drift during an observation, we provide a script ???? 
  * Chandra evt1 or evt2 file
  * Chandra aspect solution
  * the coordinates and radius of a bright, point-like X-ray source
- * a fit "type"
+ * the degree of the desired fit polynomial
 
 This script returns:
 
@@ -105,7 +105,6 @@ Set the other input and output files as desired
 
 pset correct_periscope_drift evt2file=$evt2
 pset correct_periscope_drift input_asolfile=16659/primary/pcadf537654279N001_asol1.fits.gz
-pset correct_periscope_drift corr_method=poly2
 
 correct_periscope_drift
 
