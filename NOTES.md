@@ -125,8 +125,8 @@ region (a circle centered at the provided coordinates with the supplied radius) 
 the RA, Dec of the X-ray events into approximately Aspect Camera/PCAD frame Y and Z
 relative to the RA_NOM, DEC_NOM, ROLL_NOM supplied in the event list.  
 We then fit a two independent curves to the mean-subtracted Y and Z angle data using a sherpa fit model.
-Users may select to fit a line, a second-degree polynomial, or a eighth degree
-polynomial.  Advanced users may directly edit the Python fitting script to use a custom
+A polynomial is used as the fit model; users may specify the degree of the desired
+polynomial as an option to the tool. Advanced users may directly edit the Python fitting script to use a custom
 model.
 
 The Sherpa fit is then applied to the aspect solution 'dy', 'dz' columns and a new aspect
