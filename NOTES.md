@@ -99,7 +99,7 @@ punlearn correct_periscope_drift
 
 Set the source for the tool.
 
-pset correct_periscope_drift src_x=4133.7619994320, src_y=4078.7477989208 src_radius=6
+pset correct_periscope_drift src_x=4133.7619994320 src_y=4078.7477989208 src_radius=6
 
 Set the other input and output files as desired
 
