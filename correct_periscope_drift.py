@@ -325,21 +325,35 @@ def main(opt):
     events = extract_events(opt['evtfile'],
                             opt['src_x'], opt['src_y'], opt['src_radius'])
 
-    evt_ra = events.get_column('RA').values
-    evt_dec = events.get_column('Dec').values
-    evt_times = events.get_column('Time').values
-
-    if len(evt_times) < opt['src_min_counts']:
-        raise ValueError(
-            "Only {} counts in src region.  {} required 'src_min_counts'".format(
-                len(evt_times), opt['src_min_counts']))
-
     evt_ra_nom = events.get_key('RA_NOM').value
     evt_dec_nom = events.get_key('DEC_NOM').value
     evt_roll_nom = events.get_key('ROLL_NOM').value
 
     asol = pycrates.read_file(opt['input_asolfile'])
     asol_times = asol.get_column('time').values
+
+    # Sanity check the two input files
+    asol_obsid = asol.get_key('OBS_ID').value
+    evt_obsid = events.get_key('OBS_ID').value
+    if asol_obsid != evt_obsid:
+        v1("Error Aspect solution obsid {} != event file obsid {}".format(asol_obsid, evt_obsid))
+
+    evt_ra = events.get_column('RA').values
+    evt_dec = events.get_column('Dec').values
+    evt_times = events.get_column('Time').values
+
+    # Limit to only using events contained within the range of the aspect solution
+    ok_times = (evt_times > asol_times[0]) & (evt_times < asol_times[-1])
+    if not np.any(ok_times):
+        raise ValueError("No events in region are contained within time range of aspect solution.")
+    # Limit this *in place*
+    evt_ra = evt_ra[ok_times]
+    evt_dec = evt_dec[ok_times]
+    evt_times = evt_times[ok_times]
+
+    if len(evt_times) < opt['src_min_counts']:
+        v1("Warning only {} counts in src region.  {} minimum suggested 'src_min_counts'".format(
+                len(evt_times), opt['src_min_counts']))
 
     ax_data = {}
     ax_map = {'yag': 'dy',
