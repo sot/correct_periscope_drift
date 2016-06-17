@@ -101,10 +101,10 @@ def process_command_line(argv):
         if mypars[stringpar].strip() == "":
             raise ValueError("{} parameter is empty".format(stringpar))
 
-    mypars['corr_poly_degree'] = pio.pgeti(fp, "corr_poly_degree")
-
     for floatpar in ['x', 'y', 'radius', 'src_min_counts']:
         mypars[floatpar] = pio.pgetd(fp, floatpar)
+
+    mypars['corr_poly_degree'] = pio.pgeti(fp, "corr_poly_degree")
 
     clobber = pio.pgetb(fp, "clobber")
     verbose = pio.pgeti(fp, "verbose")
