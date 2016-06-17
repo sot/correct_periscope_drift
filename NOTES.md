@@ -92,12 +92,12 @@ The source looks point-like and is contained within the specified region.
 
 Set the source for the tool.
 
-    pset correct_periscope_drift src_x=4133.7619994320 src_y=4078.7477989208 src_radius=6
+    pset correct_periscope_drift x=4133.7619994320 y=4078.7477989208 radius=6
 
 Set the other input and output files as desired
 
+    pset correct_periscope_drift infile=16659/primary/pcadf537654279N001_asol1.fits.gz
     pset correct_periscope_drift evtfile=16659/primary/acisf16659N001_evt2.fits.gz
-    pset correct_periscope_drift input_asolfile=16659/primary/pcadf537654279N001_asol1.fits.gz
 
 ### Run the tool
 
