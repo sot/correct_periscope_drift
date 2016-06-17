@@ -103,7 +103,7 @@ def process_command_line(argv):
 
     mypars['corr_poly_degree'] = pio.pgeti(fp, "corr_poly_degree")
 
-    for floatpar in ['src_x', 'src_y', 'src_radius', 'src_min_counts']:
+    for floatpar in ['x', 'y', 'radius', 'src_min_counts']:
         mypars[floatpar] = pio.pgetd(fp, floatpar)
 
     clobber = pio.pgetb(fp, "clobber")
@@ -323,7 +323,7 @@ def fit(fit_data, evt_times, data_id, opt):
 @handle_ciao_errors(TOOLNAME, VERSION)
 def main(opt):
     events = extract_events(opt['evtfile'],
-                            opt['src_x'], opt['src_y'], opt['src_radius'])
+                            opt['x'], opt['y'], opt['radius'])
 
     evt_ra_nom = events.get_key('RA_NOM').value
     evt_dec_nom = events.get_key('DEC_NOM').value
