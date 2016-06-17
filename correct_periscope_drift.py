@@ -391,7 +391,7 @@ def main(opt):
         ui.plot_fit(data_id)
         if os.path.exists(data_plot) and opt['clobber']:
             os.unlink(data_plot)
-        set_plot_xlabel("Observation elapsed/delta time (ks)")
+        set_plot_xlabel("Observation elapsed/delta time (s)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Raw data and fit in {}".format(ax))
         plot_list.append(data_plot)
