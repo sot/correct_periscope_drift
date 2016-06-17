@@ -95,7 +95,7 @@ def process_command_line(argv):
     mypars = {'progname': pinfo['progname'],
               'parname': pinfo['parname']}
 
-    for stringpar in ['evtfile', 'input_asolfile',
+    for stringpar in ['infile', 'evtfile',
                       'corr_asolfile', 'corr_plot_prefix']:
         mypars[stringpar] = pio.pgetstr(fp, stringpar)
         if mypars[stringpar].strip() == "":
@@ -145,8 +145,8 @@ def display_start_info(opts):
     v1("Running: {0}".format(opts["progname"]))
     v2("  version = {0}".format(VERSION))
     v2("with parameters:")
+    v2("  infile={0}".format(opts["infile"]))
     v2("  evtfile={0}".format(opts["evtfile"]))
-    v2("  input_asolfile={0}".format(opts["input_asolfile"]))
     # probably other values here too
     v2("  verbose={0}".format(opts["verbose"]))
     v2("  and CALDB is set to  {0}".format(os.environ["CALDB"]))
@@ -329,7 +329,7 @@ def main(opt):
     evt_dec_nom = events.get_key('DEC_NOM').value
     evt_roll_nom = events.get_key('ROLL_NOM').value
 
-    asol = pycrates.read_file(opt['input_asolfile'])
+    asol = pycrates.read_file(opt['infile'])
     asol_times = asol.get_column('time').values
 
     # Sanity check the two input files

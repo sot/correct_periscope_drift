@@ -1,5 +1,5 @@
+infile,f,a,"",,,"input aspect solution file"
 evtfile,f,a,"",,,"event file"
-input_asolfile,f,a,"",,,"input asolfile"
 corr_asolfile,f,h,"corr.fits",,,"corrected/output asolfile"
 corr_plot_prefix,f,h,"corr",,,"correction plot"
 x,r,a,,,,"src sky x"
