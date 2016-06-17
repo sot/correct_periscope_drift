@@ -96,7 +96,7 @@ def process_command_line(argv):
               'parname': pinfo['parname']}
 
     for stringpar in ['infile', 'evtfile',
-                      'corr_asolfile', 'corr_plot_prefix']:
+                      'outfile', 'corr_plot_prefix']:
         mypars[stringpar] = pio.pgetstr(fp, stringpar)
         if mypars[stringpar].strip() == "":
             raise ValueError("{} parameter is empty".format(stringpar))
@@ -123,9 +123,9 @@ def process_command_line(argv):
     # match that used by CIAO tools but I have not done this.
     #
     #
-    if not clobber and os.path.exists(mypars['corr_asolfile']):
+    if not clobber and os.path.exists(mypars['outfile']):
         raise IOError("clobber is no and outfile ({0}) exists".format(
-                mypars['corr_asolfile']))
+                mypars['outfile']))
 
     mypars['clobber'] = clobber
     mypars['verbose'] = verbose
@@ -147,6 +147,7 @@ def display_start_info(opts):
     v2("with parameters:")
     v2("  infile={0}".format(opts["infile"]))
     v2("  evtfile={0}".format(opts["evtfile"]))
+    v2("  outfile={0}".format(opts["outfile"]))
     # probably other values here too
     v2("  verbose={0}".format(opts["verbose"]))
     v2("  and CALDB is set to  {0}".format(os.environ["CALDB"]))
@@ -410,13 +411,13 @@ def main(opt):
     for c in fit_comments:
         v1("\t{}".format(c))
     v1("-" * 60)
-    v2("Writing out corrected aspect solution file to {}".format(opt['corr_asolfile']))
+    v2("Writing out corrected aspect solution file to {}".format(opt['outfile']))
     v2("\tTo review fit see correction plots in:")
     for p in plot_list:
         v2("\t\t{}".format(p))
 
     # Actually write out the new aspect solution file
-    asol.write(opt['corr_asolfile'], clobber=opt['clobber'])
+    asol.write(opt['outfile'], clobber=opt['clobber'])
 
 
 if __name__ == "__main__":
