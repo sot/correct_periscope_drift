@@ -7,7 +7,7 @@ y,r,a,,,,"src sky y"
 radius,r,a,,,,"src circle radius in arcsecs"
 src_min_counts,r,h,250,,,"minimum src counts"
 corr_poly_degree,i,h,2,1,8,"Degree of sherpa fit polynomial"
-clobber,b,h,yes,,,"Overwrite the output file if it exists?"
-verbose,i,h,5,0,5,"Debug level (0=no debug information)"
+clobber,b,h,no,,,"Overwrite the output file if it exists?"
+verbose,i,h,1,0,5,"Debug level (0=no debug information)"
 mode,s,h,"ql",,,
 
