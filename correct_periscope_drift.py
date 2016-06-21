@@ -31,8 +31,6 @@ VERSION = "0.1"
 import os
 import sys
 import numpy as np
-from numpy import sin, cos, tan, arctan2, radians, degrees, sqrt
-
 
 
 # Import the CIAO contributed modules.
@@ -47,12 +45,11 @@ from numpy import sin, cos, tan, arctan2, radians, degrees, sqrt
 
 from ciao_contrib.logger_wrapper import initialize_logger, make_verbose_level, set_verbosity, handle_ciao_errors
 from ciao_contrib.param_wrapper import open_param_file
-from ciao_contrib.runtool import dmstat
 import pycrates
 from pychips import (add_curve, print_window, set_plot_xlabel, set_plot_ylabel, clear_plot,
                      add_window, set_plot_title)
 from sherpa import ui
-
+import paramio as pio
 
 # Set up the logging/verbose code
 initialize_logger(TOOLNAME)
@@ -66,8 +63,6 @@ v5 = make_verbose_level(TOOLNAME, 5)
 
 
 def process_command_line(argv):
-
-    import paramio as pio
     """Handle the parameter input for this script."""
 
     if argv is None or argv == []:
@@ -219,7 +214,6 @@ def extract_events(event_file, src_x, src_y, src_radius):
     :param src_radius: Source region/circle radius in pixels
     :returns: CRATE of events
     """
-    import pycrates
     regstring = "circle({},{},{})".format(src_x, src_y, src_radius)
     events = pycrates.read_file("{}[sky={}]".format(
             event_file, regstring))
