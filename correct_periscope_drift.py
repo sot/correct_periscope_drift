@@ -45,6 +45,7 @@ import numpy as np
 
 from ciao_contrib.logger_wrapper import initialize_logger, make_verbose_level, set_verbosity, handle_ciao_errors
 from ciao_contrib.param_wrapper import open_param_file
+from ciao_contrib._tools.fileio import outfile_clobber_checks
 import pycrates
 from pychips import (add_curve, print_window, set_plot_xlabel, set_plot_ylabel, clear_plot,
                      add_window, set_plot_title)
@@ -113,14 +114,8 @@ def process_command_line(argv):
     # Set tool and module verbosity
     set_verbosity(verbose)
 
-    # check outfile, exiting if it exists and clobber is
-    # not set. Note: the error message should be updated to better
-    # match that used by CIAO tools but I have not done this.
-    #
-    #
-    if not clobber and os.path.exists(mypars['outfile']):
-        raise IOError("clobber is no and outfile ({0}) exists".format(
-                mypars['outfile']))
+    # check outfile
+    outfile_clobber_checks(clobber, mypars['outfile'])
 
     mypars['clobber'] = clobber
     mypars['verbose'] = verbose
