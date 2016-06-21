@@ -220,21 +220,21 @@ def extract_events(event_file, src_x, src_y, src_radius):
     return events
 
 
-def get_event_yag_zag(evt_ra, evt_dec, ra_nom, dec_nom, roll_nom):
+def get_event_yag_zag(evt_ra, evt_dec, ra_pnt, dec_pnt, roll_pnt):
     """
     Convert RA and Dec positions into Y and Z angle
 
-    This takes the RA and Dec positions of the events and takes a "nominal" pointing
-    (which maybe taken from the nominal values provided in the event file header
-    and uses that reference nominal pointing to convert to Y and Z angle
+    This takes the RA and Dec positions of the events and takes a reference pointing
+    (which maybe taken from the NOM or PNT values provided in the event file header)
+    and uses that reference pointing to convert to Y and Z angle
     that should relate to Aspect Camera Y and Z angle for the purposes of
     fitting Y and Z angle periscope drift.
 
     :param evt_ra: event RA
     :param evt_dec: event Dec
-    :param ra_nom: A single "nominal" reference value for RA
-    :param dec_nom: A single "nominal" reference value for Dec
-    :param roll_nom: A single "nominal" reference value for Roll
+    :param ra_pnt: A single reference value for RA
+    :param dec_pnt: A single reference value for Dec
+    :param roll_pnt: A single reference value for Roll
     :returns: yag, zag in arcsecs
     """
     if len(evt_ra) != len(evt_dec):
@@ -246,7 +246,7 @@ def get_event_yag_zag(evt_ra, evt_dec, ra_nom, dec_nom, roll_nom):
     # transform from 3 x N to N x 3
     eci = eci.transpose()
 
-    att_stack = np.repeat(np.array([ra_nom, dec_nom, roll_nom]),
+    att_stack = np.repeat(np.array([ra_pnt, dec_pnt, roll_pnt]),
                           len(evt_ra)).reshape(3, len(evt_ra))
     # Transforms
     Ts = equatorial2transform(att_stack[0], att_stack[1], att_stack[2])
@@ -319,9 +319,9 @@ def main(opt):
     events = extract_events(opt['evtfile'],
                             opt['x'], opt['y'], opt['radius'])
 
-    evt_ra_nom = events.get_key('RA_NOM').value
-    evt_dec_nom = events.get_key('DEC_NOM').value
-    evt_roll_nom = events.get_key('ROLL_NOM').value
+    evt_ra_pnt = events.get_key('RA_PNT').value
+    evt_dec_pnt = events.get_key('DEC_PNT').value
+    evt_roll_pnt = events.get_key('ROLL_PNT').value
 
     asol = pycrates.read_file(opt['infile'])
     asol_times = asol.get_column('time').values
@@ -354,7 +354,7 @@ def main(opt):
               'zag': 'dz'}
 
     ax_data['yag'], ax_data['zag'] = get_event_yag_zag(evt_ra, evt_dec,
-                                                       evt_ra_nom, evt_dec_nom, evt_roll_nom)
+                                                       evt_ra_pnt, evt_dec_pnt, evt_roll_pnt)
 
     # Store comments to print in block after all of the sherpa fit output
     fit_comments = []
