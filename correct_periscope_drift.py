@@ -397,6 +397,8 @@ def main(opt):
         fit_comments.append("Max absolute correction of {:.2f} arcsec for {} axis".format(
                 np.max(np.abs(asol_corr)), ax))
 
+        # Convert the correction from arcsecs to mm (divide by 20) and add the correction
+        # to the dy and dz columns in the file.
         asol_col_to_fix.values += (asol_corr / 20)
 
     v1("-" * 60)
