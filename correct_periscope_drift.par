@@ -1,7 +1,7 @@
 infile,f,a,"",,,"input aspect solution file"
 evtfile,f,a,"",,,"event file"
 outfile,f,h,"corr.fits",,,"corrected/output aspect solution file"
-corr_plot_prefix,f,h,"corr",,,"correction plot"
+corr_plot_root,f,h,"corr",,,"prefix for correction evaluation plots"
 x,r,a,,,,"src sky x"
 y,r,a,,,,"src sky y"
 radius,r,a,,,,"src circle radius in arcsecs"

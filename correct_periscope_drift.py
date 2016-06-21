@@ -91,7 +91,7 @@ def process_command_line(argv):
               'parname': pinfo['parname']}
 
     for stringpar in ['infile', 'evtfile',
-                      'outfile', 'corr_plot_prefix']:
+                      'outfile', 'corr_plot_root']:
         mypars[stringpar] = pio.pgetstr(fp, stringpar)
         if mypars[stringpar].strip() == "":
             raise ValueError("{} parameter is empty".format(stringpar))
@@ -373,14 +373,14 @@ def main(opt):
         set_plot_xlabel("Observation elapsed/delta time (ks)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Fit of {} data (with time-binned event offsets)".format(ax))
-        fit_plot = "{}_fit_{}.png".format(opt['corr_plot_prefix'], ax)
+        fit_plot = "{}_fit_{}.png".format(opt['corr_plot_root'], ax)
         if os.path.exists(fit_plot) and opt['clobber']:
             os.unlink(fit_plot)
         plot_list.append(fit_plot)
         print_window(fit_plot)
 
         add_window()
-        data_plot = "{}_data_{}.png".format(opt['corr_plot_prefix'], ax)
+        data_plot = "{}_data_{}.png".format(opt['corr_plot_root'], ax)
         ui.plot_fit(data_id)
         if os.path.exists(data_plot) and opt['clobber']:
             os.unlink(data_plot)
