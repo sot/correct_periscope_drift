@@ -150,7 +150,6 @@ def display_start_info(opts):
     v2("  outfile={0}".format(opts["outfile"]))
     # probably other values here too
     v2("  verbose={0}".format(opts["verbose"]))
-    v2("  and CALDB is set to  {0}".format(os.environ["CALDB"]))
     v2("  and ASCDS_INSTALL is {0}".format(os.environ["ASCDS_INSTALL"]))
     v2("-" * 60)
 
