@@ -327,8 +327,15 @@ def main(opt):
     if asol_obsid != evt_obsid:
         v1("Error Aspect solution obsid {} != event file obsid {}".format(asol_obsid, evt_obsid))
 
-    evt_ra = events.get_column('RA').values
-    evt_dec = events.get_column('Dec').values
+    # Extract event RA, Dec, and times from event file
+    # Do the WCS transformation directly instead of using the pycrates RA/Dec properties to
+    # work around intermittent bug https://icxc.harvard.edu/pipe/ascds_help/2013a/0315.html
+    wcs = events.get_transform("eqpos")
+    evt_x = events.get_column("x").values
+    evt_y = events.get_column("y").values
+    rd = wcs.apply(zip(evt_x, evt_y))
+    evt_ra = rd[:, 0]
+    evt_dec = rd[:, 1]
     evt_times = events.get_column('Time').values
 
     # Limit to only using events contained within the range of the aspect solution
