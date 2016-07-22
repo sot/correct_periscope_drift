@@ -165,7 +165,7 @@ This is an example, see the CIAO thread referenced earlier for details for your 
 The correction and fitting routine extracts the X-ray events from the provided source
 region (a circle centered at the provided coordinates with the supplied radius) and converts
 the RA, Dec of the X-ray events into approximately Aspect Camera/PCAD frame Y and Z
-relative to the RA_NOM, DEC_NOM, ROLL_NOM supplied in the event list.  
+relative to the RA_PNT, DEC_PNT, ROLL_PNT supplied in the event list.  
 We then fit a two independent curves to the mean-subtracted Y and Z angle data using a sherpa fit model.
 A polynomial is used as the fit model; users may specify the degree of the desired
 polynomial as an option to the tool. Advanced users may directly edit the Python fitting script to use a custom
