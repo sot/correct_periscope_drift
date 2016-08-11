@@ -135,9 +135,9 @@ def display_start_info(opts):
     v1("Running: {0}".format(opts["progname"]))
     v2("  version = {0}".format(VERSION))
     v2("with parameters:")
-    v2("  infile={0}".format(opts["infile"]))
-    v2("  evtfile={0}".format(opts["evtfile"]))
-    v2("  outfile={0}".format(opts["outfile"]))
+    v1("  infile={0}".format(opts["infile"]))
+    v1("  evtfile={0}".format(opts["evtfile"]))
+    v1("  outfile={0}".format(opts["outfile"]))
     # probably other values here too
     v2("  verbose={0}".format(opts["verbose"]))
     v2("  and ASCDS_INSTALL is {0}".format(os.environ["ASCDS_INSTALL"]))
@@ -403,11 +403,11 @@ def main(opt):
         # to the dy and dz columns in the file.
         asol_col_to_fix.values += (asol_corr / 20)
 
-    v1("-" * 60)
-    v1("Fit results")
+    v2("-" * 60)
+    v2("Fit results")
     for c in fit_comments:
-        v1("\t{}".format(c))
-    v1("-" * 60)
+        v2("\t{}".format(c))
+    v2("-" * 60)
     v2("Writing out corrected aspect solution file to {}".format(opt['outfile']))
     v2("\tTo review fit see correction plots in:")
     for p in plot_list:
