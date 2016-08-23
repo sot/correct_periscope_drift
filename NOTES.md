@@ -5,16 +5,16 @@
 Temporal drift in X-ray source positions can occur due to changes in the periscope
 alignment which induce drift in fid light positions as observed by the Aspect camera.
 
-As of DS ????, a dynamic correction is applied to the aspect solution using the periscope
-gradients.  This correction reduces ???? .  Based on observed data, there may be
-uncorrected drift of up to ??? per ks.  These observed drifts are increasing ....
-At this time, the Aspect team suggests that to accomplish
-science requiring fine position or structure that users should use their fixed-position X-ray data to
-autocorrect residual drift induced by the periscope.
+As of DS 8.4, a dynamic correction is applied to the aspect solution using the periscope
+gradients telemetry.  This correction was fit using available data in 2010.  However,
+temporal drifts have continued to increase with thermal variation of the spacecraft and at
+this time, the Aspect team suggests that to accomplish science requiring fine position or
+structure that users should use their own fixed-position X-ray data to autocorrect
+residual drift induced by the periscope.
 
 ## Overview of determining a correction
 
-To aid in determining the drift during an observation, we provide a script ???? which takes as input:
+To aid in determining the drift during an observation, we provide a script which takes as input:
 
  * Chandra evt1 or evt2 file
  * Chandra aspect solution
@@ -176,9 +176,7 @@ solution file with those updated columns is written out.
 
 ## API
 
-The script ???? uses the standard parameter interface with these allowed parameters:
-
-
+The script uses the standard parameter interface with these allowed parameters:
 
 
 
