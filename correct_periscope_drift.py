@@ -123,6 +123,10 @@ def process_command_line(argv):
 
     # check outfile
     outfile_clobber_checks(clobber, mypars['outfile'])
+    # and plotfiles
+    for ax in ['yag', 'zag']:
+        outfile_clobber_checks(clobber, "{}_fit_{}.png".format(mypars['corr_plot_root'], ax))
+        outfile_clobber_checks(clobber, "{}_data_{}.png".format(mypars['corr_plot_root'], ax))
 
     mypars['clobber'] = clobber
     mypars['verbose'] = verbose
