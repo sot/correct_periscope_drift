@@ -267,6 +267,16 @@ def get_event_yag_zag(evt_ra, evt_dec, ra_pnt, dec_pnt, roll_pnt):
 
 
 def time_bins(times, x, nbins=20):
+    """
+    Bin 'x' by the times in 'times'.
+    This is only used as a plot aid.
+
+    :param times: times used for time bins
+    :param x: dataset binned in equal time chunks
+    :param n_bins: number of time bins to use
+    :returns: bin time centers, bin data mean, bin data std
+    """
+
     h, bins = np.histogram(times, bins=nbins)
     bin_centers = (bins[:-1] + bins[1:]) / 2.0
     inds = np.digitize(times, bins) - 1
@@ -281,6 +291,18 @@ def time_bins(times, x, nbins=20):
 
 
 def _fit_poly(fit_data, evt_times, degree, data_id=0):
+    """
+    Given event data transformed into Y or Z angle positions, and a degree of the desired
+    fit polynomial, fit a polynomial to the data.
+
+    :param fit_data: event y or z angle position data
+    :param evt_times: times of event/fit_data
+    :param degree: degree of polynomial to use for the fit model
+    :param data_id: sherpa dataset id to use for the fit
+
+    :returns: (sherpa model plot, sherpa model)
+    """
+
 
     init_error = 5
 
