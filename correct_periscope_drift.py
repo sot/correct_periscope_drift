@@ -280,7 +280,7 @@ def time_bins(times, x, nbins=20):
     return bin_centers, np.array(bin_x), np.array(bin_std)
 
 
-def fit(fit_data, evt_times, data_id, opt):
+def _fit_poly(fit_data, evt_times, degree, data_id=0):
 
     init_error = 5
 
@@ -297,7 +297,7 @@ def fit(fit_data, evt_times, data_id, opt):
     calc_error = init_error * np.sqrt(fit.rstat)
     ui.set_staterror(data_id, calc_error)
     # Then fit the specified model
-    v2("Fitting a polynomial of degree {} to the data".format(opt['corr_poly_degree']))
+    v2("Fitting a polynomial of degree {} to the data".format(degree))
     ui.polynom1d.fitpoly
     ui.freeze('fitpoly')
     # Thaw the coefficients requested by the degree of the desired polynomial
@@ -308,7 +308,8 @@ def fit(fit_data, evt_times, data_id, opt):
     ui.set_model(data_id, 'fitpoly')
     ui.fit(data_id)
     mp = ui.get_model_plot(data_id)
-    return mp
+    model = ui.get_model(data_id)
+    return mp, model
 
 
 # The '@handle_ciao_errors' decorator will catch any error thrown and
@@ -380,7 +381,7 @@ def main(opt):
 
     for data_id, ax in enumerate(['yag', 'zag']):
         fit_data = ax_data[ax] - np.mean(ax_data[ax])
-        mp = fit(fit_data, evt_times, data_id, opt)
+        mp, model = _fit_poly(fit_data, evt_times, opt['corr_poly_degree'], data_id=data_id)
 
         bin_centers, bin_mean, bin_std = time_bins(evt_times, fit_data)
 
