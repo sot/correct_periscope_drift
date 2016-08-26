@@ -304,7 +304,8 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
     """
 
 
-    init_error = 5
+    # Set initial value for fit data position error
+    init_error = 1
 
     ui.clean()
     ui.load_arrays(data_id, evt_times - evt_times[0], fit_data,
