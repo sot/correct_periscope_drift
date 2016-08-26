@@ -30,6 +30,7 @@ VERSION = "0.1"
 # import standard python modules as required
 import os
 import sys
+import logging
 import numpy as np
 
 
@@ -61,6 +62,12 @@ initialize_logger(TOOLNAME)
 v1 = make_verbose_level(TOOLNAME, 1)
 v2 = make_verbose_level(TOOLNAME, 2)
 v5 = make_verbose_level(TOOLNAME, 5)
+
+LOGLEVELS = {5: logging.DEBUG,
+             4: logging.INFO,
+             3: logging.WARNING,
+             2: logging.ERROR,
+             1: logging.CRITICAL}
 
 
 def process_command_line(argv):
@@ -311,6 +318,11 @@ def fit(fit_data, evt_times, data_id, opt):
 
 @handle_ciao_errors(TOOLNAME, VERSION)
 def main(opt):
+
+    # Use verbose option to control sherpa output
+    logger = logging.getLogger("sherpa")
+    logger.setLevel(LOGLEVELS[opt['verbose']])
+
     events = extract_events(opt['evtfile'],
                             opt['x'], opt['y'], opt['radius'])
 
