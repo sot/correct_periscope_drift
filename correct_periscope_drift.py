@@ -301,10 +301,10 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
     ui.polynom1d.fitpoly
     ui.freeze('fitpoly')
     # Thaw the coefficients requested by the degree of the desired polynomial
-    for deg in range(1, 1 + opt['corr_poly_degree']):
+    ui.thaw('fitpoly.c0')
+    fitpoly.c0.val = 0
+    for deg in range(1, 1 + degree):
         ui.thaw("fitpoly.c{}".format(deg))
-    if opt['corr_poly_degree'] > 1:
-        ui.thaw('fitpoly.offset')
     ui.set_model(data_id, 'fitpoly')
     ui.fit(data_id)
     mp = ui.get_model_plot(data_id)
