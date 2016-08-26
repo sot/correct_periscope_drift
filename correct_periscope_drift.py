@@ -312,6 +312,19 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
     return mp, model
 
 
+
+def write_key(crate, name, value, comment, units=""):
+    """
+    Wrapper around crate key creation. Borrowed from srcflux
+    """
+    kw = pycrates.CrateKey()
+    kw.name = name
+    kw.value = value
+    kw.desc = comment
+    kw.unit = units
+    crate.add_key(kw)
+
+
 # The '@handle_ciao_errors' decorator will catch any error thrown and
 # display it in a format like that of a CIAO tool, then exit with a
 # non-zero status. So, if at any point in your code you need to exit just
@@ -419,6 +432,30 @@ def main(opt):
         # Convert the correction from arcsecs to mm (divide by 20) and add the correction
         # to the dy and dz columns in the file.
         asol_col_to_fix.values += (asol_corr / 20)
+
+        # Add header keys saving the axis-specific parts of this correction
+        write_key(asol, "ADC{}MN".format(ax.upper()), np.mean(ax_data[ax]),
+                  "Aspect Drift Corr. Mean of uncorr {} data".format(ax))
+        for deg in range(0, 1 + opt['corr_poly_degree']):
+            write_key(asol, "ADC{}C{}".format(ax.upper(), deg),
+                      getattr(model, 'c{}'.format(deg)).val,
+                      "Aspect Drift Corr. {} model c{}".format(ax, deg))
+
+
+    # Add header keywords about fit
+    write_key(asol, "ADCTIME0", evt_times[0],
+              "Aspect Drift Corr. reference time")
+    write_key(asol, "ADCSRCX", opt['x'],
+              "Aspect Drift Corr. input src x")
+    write_key(asol, "ADCSRCY", opt['y'],
+              "Aspect Drift Corr. input src y")
+    write_key(asol, "ADCSRCR", opt['radius'],
+              "Aspect Drift Corr. input src radius", units='pix')
+    write_key(asol, "ADCORDR", opt['corr_poly_degree'],
+              "Aspect Drift Corr. model poly degree")
+    write_key(asol, "ADCVER", VERSION,
+              "Aspect Drift Corr. tool version")
+
 
     v2("-" * 60)
     v2("Fit results")
