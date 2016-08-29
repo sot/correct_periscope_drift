@@ -148,9 +148,9 @@ This is an example, see the CIAO thread referenced earlier for details for your 
 ### Verify the outputs
 
     pset correct_periscope_drift evtfile=acis_dstrk_evt2.fits
-    pset correct_periscope_drift input_asolfile=corr.fits
-    pset correct_periscope_drift corr_asolfile=already_fixed.fits
-    pset correct_periscope_drift corr_plot_prefix="already_fixed"
+    pset correct_periscope_drift infile=corr.fits
+    pset correct_periscope_drift outfile=already_fixed.fits
+    pset correct_periscope_drift corr_plot_root="already_fixed"
     correct_periscope_drift
 
 ![y-angle fit and binned data](already_fixed_fit_yag.png)
@@ -178,6 +178,18 @@ solution file with those updated columns is written out.
 
 The script uses the standard parameter interface with these allowed parameters:
 
+ * infile - input aspect solution file
+ * evtfile - event file
+ * outfile - corrected/output aspect solution file
+ * corr_plot_root - prefix for correction evaluation plots
+ * x - src sky x
+ * y - src sky y
+ * radius - src circle radius in pixels
+ * src_min_counts - minimum required src counts
+ * corr_poly_degree - Degree of sherpa fit polynomial
+ * clobber - Overwrite the output files if they exist?
+ * verbose - Debug level (0=no debug information)
+ * mode
 
 
 ## References
