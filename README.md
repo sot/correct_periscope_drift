@@ -2,15 +2,18 @@
 
 ## Introduction and History
 
-Temporal drift in X-ray source positions can occur due to changes in the periscope
-alignment which induce drift in fid light positions as observed by the Aspect camera.
+Thermal cycling on the spacecraft can result in an apparent temporal drift of the sky
+position of an X-ray source during an observation.  This appears as a drift of up to about
+0.5 arcsec in X-ray event sky X, Y coordinates over time.  Because of the thermal
+variation time scales, this effect is usually most prominent in long observations (more
+than about 50 ksec).
 
-As of DS 8.4, a dynamic correction is applied to the aspect solution using the periscope
-gradients telemetry.  This correction was fit using available data in 2010.  However,
-temporal drifts have continued to increase with thermal variation of the spacecraft and at
-this time, the Aspect team suggests that to accomplish science requiring fine position or
-structure that users should use their own fixed-position X-ray data to autocorrect
-residual drift induced by the periscope.
+As of DS 8.4, a drift correction is applied to the aspect solution using the periscope
+gradients telemetry.  However, temporal drifts have continued to increase with thermal
+variation of the spacecraft.  Therefore the Aspect team suggests that to accomplish
+science related to sub-arcsec source structure, users should follow this thread to correct
+residual drift induced by the periscope.  This requires a relatively bright, on-axis source (within
+a few arcmin off-axis angle) to perform a "self-calibration" of the aspect solution.
 
 ## Overview of determining a correction
 
@@ -18,13 +21,13 @@ To aid in determining the drift during an observation, we provide a script which
 
  * Chandra evt1 or evt2 file
  * Chandra aspect solution
- * the coordinates and radius of a bright, point-like X-ray source
- * the degree of the desired fit polynomial
+ * Coordinates and radius of a bright, point-like X-ray source
+ * Degree of the desired fit polynomial
 
 This script returns:
 
  * Plots of the fits of the drift in Aspect Camera Y and Z angle
- * A new aspect solution file with offsets updated to include drift corrections
+ * New aspect solution file with offsets updated to include drift corrections
 
 Users of the script may use the plots to evaluate the goodness of fit to their data and to
 determine if applying the correction will have value.
