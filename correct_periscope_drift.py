@@ -289,8 +289,6 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
 
     :returns: (sherpa model plot, sherpa model)
     """
-
-
     # Set initial value for fit data position error
     init_error = 1
 
@@ -320,7 +318,6 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
     mp = ui.get_model_plot(data_id)
     model = ui.get_model(data_id)
     return mp, model
-
 
 
 def write_key(crate, name, value, comment, units=""):
@@ -451,7 +448,6 @@ def main(opt):
                       getattr(model, 'c{}'.format(deg)).val,
                       "Aspect Drift Corr. {} model c{}".format(ax, deg))
 
-
     # Add header keywords about fit
     write_key(asol, "ADCTIME0", evt_times[0],
               "Aspect Drift Corr. reference time")
@@ -465,7 +461,6 @@ def main(opt):
               "Aspect Drift Corr. model poly degree")
     write_key(asol, "ADCVER", VERSION,
               "Aspect Drift Corr. tool version")
-
 
     v2("-" * 60)
     v2("Fit results")
@@ -485,8 +480,3 @@ if __name__ == "__main__":
     opt = process_command_line(sys.argv)
     display_start_info(opt)
     main(opt)
-
-
-
-
-
