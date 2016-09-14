@@ -405,7 +405,7 @@ def main(opt):
 
         bin_centers, bin_mean, bin_std = time_bins(evt_times, fit_data)
 
-        add_window()
+        add_window(6, 4, "inches")
         add_curve((bin_centers - evt_times[0]) / 1000., bin_mean, [bin_std, +bin_std],
                   ["line.style", "none", "symbol.style", "none", "err.style", "cap"])
         add_curve(mp.x / 1000., mp.y, ["symbol.style", "none"])
@@ -421,7 +421,7 @@ def main(opt):
         plot_list.append(fit_plot)
         print_window(fit_plot)
 
-        add_window()
+        add_window(6, 4, "inches")
         data_plot = "{}_data_{}.png".format(opt['corr_plot_root'], ax)
         ui.get_data_plot_prefs()['yerrorbars'] = False
         ui.plot_fit(data_id)
