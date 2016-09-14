@@ -49,7 +49,7 @@ from ciao_contrib.param_wrapper import open_param_file
 from ciao_contrib._tools.fileio import outfile_clobber_checks
 import pycrates
 from pychips import (add_curve, print_window, set_plot_xlabel, set_plot_ylabel, clear_plot,
-                     add_window, set_plot_title)
+                     add_window, set_plot_title, limits, Y_AXIS)
 from sherpa import ui
 import paramio as pio
 
@@ -409,6 +409,9 @@ def main(opt):
         add_curve((bin_centers - evt_times[0]) / 1000., bin_mean, [bin_std, +bin_std],
                   ["line.style", "none", "symbol.style", "none", "err.style", "cap"])
         add_curve(mp.x / 1000., mp.y, ["symbol.style", "none"])
+        # set minimum limit on fit plot in arcsecs and set this explicitly as a symmetric limit
+        fit_ymax = max(0.3, np.max(np.abs(bin_mean - bin_std)), np.max(np.abs(bin_mean + bin_std)))
+        limits(Y_AXIS, -1 * fit_ymax, fit_ymax)
         set_plot_xlabel("Observation elapsed/delta time (ks)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Fit of {} data (with time-binned event offsets)".format(ax))
@@ -423,6 +426,9 @@ def main(opt):
         ui.plot_fit(data_id)
         if os.path.exists(data_plot) and opt['clobber']:
             os.unlink(data_plot)
+        # set minimum limit on data plot in arcsecs and set this explicitly as a symmetric limit
+        data_ymax = max(2.0, np.max(np.abs(fit_data)) + .2)
+        limits(Y_AXIS, -1 * data_ymax, data_ymax)
         set_plot_xlabel("Observation elapsed/delta time (s)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Raw data and fit in {}".format(ax))
