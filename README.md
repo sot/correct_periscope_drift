@@ -122,7 +122,8 @@ the fits and the event data.
 
 ### Run chandra_repro with the new aspect solution.
 
-    mv 16659/primary/pcadf537654279N001_asol1.fits.gz 16659/primary/pcadf537654279N001_asol1.fits.gz.ORIG
+    # move the original aspect solution out of the primary directory and rename
+    mv 16659/primary/pcadf537654279N001_asol1.fits.gz 16659/pcadf537654279N001_asol1.fits.gz.ORIG
     cp driftcorr_asol1.fits 16659/primary/pcadf537654279N001_driftcorr_asol1.fits
     cd 16659
     chandra_repro
