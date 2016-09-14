@@ -423,6 +423,7 @@ def main(opt):
 
         add_window()
         data_plot = "{}_data_{}.png".format(opt['corr_plot_root'], ax)
+        ui.get_data_plot_prefs()['yerrorbars'] = False
         ui.plot_fit(data_id)
         if os.path.exists(data_plot) and opt['clobber']:
             os.unlink(data_plot)
