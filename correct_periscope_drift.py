@@ -197,19 +197,6 @@ def radec2eci(ra, dec):
     return np.array([np.cos(r) * np.cos(d), np.sin(r) * np.cos(d), np.sin(d)])
 
 
-#def roll_range(asp_roll):
-#    max_roll = np.max(asp_roll)
-#    min_roll = np.min(asp_roll)
-#    if (max_roll - min_roll) > 180:
-#        roll_180 = asp_roll.copy()
-#        roll_180[roll_180 > 180] -= 360
-#        max_roll = np.max(roll_180)
-#        min_roll = np.min(roll_180)
-#        if max_roll - min_roll > 180:
-#            raise ValueError("> 180 deg roll range")
-#    return max_roll - min_roll
-#
-
 def extract_events(event_file, src_x, src_y, src_radius):
     """
     Get events from specified source circle
