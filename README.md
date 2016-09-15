@@ -44,6 +44,14 @@ and
 
 http://cxc.harvard.edu/ciao/ahelp/chandra_repro.html
 
+## Note on coordinate systems
+
+The correction is performed by directly updating the dy and dz values in the aspect
+solution.  The dy/dz values are aligned with the Aspect Camera Y and Z axes, and
+therefore, to fit the X-ray events, this tool transforms the event coordinates into
+positions in the Aspect Camera frame, and then independently fits offsets in those Y and Z
+axes.  Note that the positions in this frame are abbreviated 'yag' and 'zag' in the fit and
+data plots output by the tool.
 
 ## Walkthrough/Example
 
