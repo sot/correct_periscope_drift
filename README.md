@@ -32,7 +32,6 @@ This script returns:
 Users of the script may use the plots to evaluate the goodness of fit to their data and to
 determine if applying the correction will have value.
 
-
 ## Applying a correction
 
 This new aspect solution may be applied via the chandra_repro (via acis_process_events or
@@ -120,13 +119,14 @@ Set the other input and output files as desired
 
     correct_periscope_drift
 
-The tool will write out an updated aspect solution to 'corr.fits' by default and plots of
-the fits and the event data.
+The tool will write out an updated aspect solution to 'driftcorr_asol1.fits' as requested
+by the outfile parameter and will save the plots of the fits into the working directory.
 
 ![y-angle fit and binned data](corr_fit_yag.png)
 ![y-angle fit and raw data](corr_data_yag.png)
 ![z-angle fit and binned data](corr_fit_zag.png)
 ![z-angle fit and raw data](corr_data_zag.png)
+
 
 ### Run chandra_repro with the new aspect solution.
 
@@ -135,6 +135,7 @@ the fits and the event data.
     cp driftcorr_asol1.fits 16659/primary/pcadf537654279N001_driftcorr_asol1.fits
     cd 16659
     chandra_repro
+    cd ..
 
 ### Verify the outputs
 
