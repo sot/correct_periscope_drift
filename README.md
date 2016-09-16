@@ -137,6 +137,11 @@ by the outfile parameter and will save the plots of the fits into the working di
     chandra_repro
     cd ..
 
+Note that the duration of the event processing (acis_process_events, hrc_process_events)
+task in chandra_repro scales with the number of events and, for the long observations with
+bright sources for which this tool is useful, may take more than 30 minutes to run on a
+modern CPU.
+
 ### Verify the outputs
 
     pset correct_periscope_drift evtfile=16659/repro/acisf16659_repro_evt2.fits
