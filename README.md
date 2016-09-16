@@ -122,10 +122,10 @@ Set the other input and output files as desired
 The tool will write out an updated aspect solution to 'driftcorr_asol1.fits' as requested
 by the outfile parameter and will save the plots of the fits into the working directory.
 
-![y-angle fit and binned data](corr_fit_yag.png)
-![y-angle fit and raw data](corr_data_yag.png)
-![z-angle fit and binned data](corr_fit_zag.png)
-![z-angle fit and raw data](corr_data_zag.png)
+![y-angle fit and binned data](demo_corr_fit_yag.png)
+![y-angle fit and raw data](demo_corr_data_yag.png)
+![z-angle fit and binned data](demo_corr_fit_zag.png)
+![z-angle fit and raw data](demo_corr_data_zag.png)
 
 
 ### Run chandra_repro with the new aspect solution.
