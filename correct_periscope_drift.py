@@ -49,7 +49,7 @@ from ciao_contrib.param_wrapper import open_param_file
 from ciao_contrib._tools.fileio import outfile_clobber_checks
 import pycrates
 from pychips import (add_curve, print_window, set_plot_xlabel, set_plot_ylabel, clear_plot,
-                     add_window, set_plot_title)
+                     add_window, set_plot_title, limits, Y_AXIS)
 from sherpa import ui
 import paramio as pio
 
@@ -197,19 +197,6 @@ def radec2eci(ra, dec):
     return np.array([np.cos(r) * np.cos(d), np.sin(r) * np.cos(d), np.sin(d)])
 
 
-#def roll_range(asp_roll):
-#    max_roll = np.max(asp_roll)
-#    min_roll = np.min(asp_roll)
-#    if (max_roll - min_roll) > 180:
-#        roll_180 = asp_roll.copy()
-#        roll_180[roll_180 > 180] -= 360
-#        max_roll = np.max(roll_180)
-#        min_roll = np.min(roll_180)
-#        if max_roll - min_roll > 180:
-#            raise ValueError("> 180 deg roll range")
-#    return max_roll - min_roll
-#
-
 def extract_events(event_file, src_x, src_y, src_radius):
     """
     Get events from specified source circle
@@ -302,8 +289,6 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
 
     :returns: (sherpa model plot, sherpa model)
     """
-
-
     # Set initial value for fit data position error
     init_error = 1
 
@@ -333,7 +318,6 @@ def _fit_poly(fit_data, evt_times, degree, data_id=0):
     mp = ui.get_model_plot(data_id)
     model = ui.get_model(data_id)
     return mp, model
-
 
 
 def write_key(crate, name, value, comment, units=""):
@@ -421,10 +405,13 @@ def main(opt):
 
         bin_centers, bin_mean, bin_std = time_bins(evt_times, fit_data)
 
-        add_window()
+        add_window(6, 4, "inches")
         add_curve((bin_centers - evt_times[0]) / 1000., bin_mean, [bin_std, +bin_std],
                   ["line.style", "none", "symbol.style", "none", "err.style", "cap"])
         add_curve(mp.x / 1000., mp.y, ["symbol.style", "none"])
+        # set minimum limit on fit plot in arcsecs and set this explicitly as a symmetric limit
+        fit_ymax = max(0.3, np.max(np.abs(bin_mean - bin_std)), np.max(np.abs(bin_mean + bin_std)))
+        limits(Y_AXIS, -1 * fit_ymax, fit_ymax)
         set_plot_xlabel("Observation elapsed/delta time (ks)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Fit of {} data (with time-binned event offsets)".format(ax))
@@ -434,11 +421,15 @@ def main(opt):
         plot_list.append(fit_plot)
         print_window(fit_plot)
 
-        add_window()
+        add_window(6, 4, "inches")
         data_plot = "{}_data_{}.png".format(opt['corr_plot_root'], ax)
+        ui.get_data_plot_prefs()['yerrorbars'] = False
         ui.plot_fit(data_id)
         if os.path.exists(data_plot) and opt['clobber']:
             os.unlink(data_plot)
+        # set minimum limit on data plot in arcsecs and set this explicitly as a symmetric limit
+        data_ymax = max(2.0, np.max(np.abs(fit_data)) + .2)
+        limits(Y_AXIS, -1 * data_ymax, data_ymax)
         set_plot_xlabel("Observation elapsed/delta time (s)")
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Raw data and fit in {}".format(ax))
@@ -464,7 +455,6 @@ def main(opt):
                       getattr(model, 'c{}'.format(deg)).val,
                       "Aspect Drift Corr. {} model c{}".format(ax, deg))
 
-
     # Add header keywords about fit
     write_key(asol, "ADCTIME0", evt_times[0],
               "Aspect Drift Corr. reference time")
@@ -478,7 +468,6 @@ def main(opt):
               "Aspect Drift Corr. model poly degree")
     write_key(asol, "ADCVER", VERSION,
               "Aspect Drift Corr. tool version")
-
 
     v2("-" * 60)
     v2("Fit results")
@@ -498,8 +487,3 @@ if __name__ == "__main__":
     opt = process_command_line(sys.argv)
     display_start_info(opt)
     main(opt)
-
-
-
-
-

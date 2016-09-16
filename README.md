@@ -32,13 +32,25 @@ This script returns:
 Users of the script may use the plots to evaluate the goodness of fit to their data and to
 determine if applying the correction will have value.
 
-
 ## Applying a correction
 
-This new aspect solution may be applied via the _process_events procedure to correct the
-sky positions in a new evt2 file.  See
+This new aspect solution may be applied via the chandra_repro (via acis_process_events or
+hrc_process_events) procedure to correct the sky positions in a new evt2 file.  See
 
 http://cxc.harvard.edu/ciao/threads/createL2/
+
+and
+
+http://cxc.harvard.edu/ciao/ahelp/chandra_repro.html
+
+## Note on coordinate systems
+
+The correction is performed by directly updating the dy and dz values in the aspect
+solution.  The dy/dz values are aligned with the Aspect Camera Y and Z axes, and
+therefore, to fit the X-ray events, this tool transforms the event coordinates into
+positions in the Aspect Camera frame, and then independently fits offsets in those Y and Z
+axes.  Note that the positions in this frame are abbreviated 'yag' and 'zag' in the fit and
+data plots output by the tool.
 
 ## Walkthrough/Example
 
@@ -101,57 +113,39 @@ Set the other input and output files as desired
 
     pset correct_periscope_drift infile=16659/primary/pcadf537654279N001_asol1.fits.gz
     pset correct_periscope_drift evtfile=16659/primary/acisf16659N001_evt2.fits.gz
+    pset correct_periscope_drift outfile=driftcorr_asol1.fits
 
 ### Run the tool
 
     correct_periscope_drift
 
-The tool will write out an updated aspect solution to 'corr.fits' by default and plots of
-the fits and the event data.
+The tool will write out an updated aspect solution to 'driftcorr_asol1.fits' as requested
+by the outfile parameter and will save the plots of the fits into the working directory.
 
 ![y-angle fit and binned data](corr_fit_yag.png)
 ![y-angle fit and raw data](corr_data_yag.png)
 ![z-angle fit and binned data](corr_fit_zag.png)
 ![z-angle fit and raw data](corr_data_zag.png)
 
-### Run ???_process_events with the new aspect solution.
 
-This is an example, see the CIAO thread referenced earlier for details for your situation.
+### Run chandra_repro with the new aspect solution.
 
-    ln -s 16659/secondary/acisf16659_000N001_evt1.fits.gz acis_evt1.fits.gz
-    ln -s 16659/primary/acisf16659_000N001_bpix1.fits.gz acis_bpix1.fits.gz
-    ln -s 16659/secondary/acisf16659_000N001_flt1.fits.gz acis_flt1.fits.gz
-    ln -s 16659/secondary/acisf16659_000N001_mtl1.fits.gz acis_mtl1.fits.gz
-    ln -s corr.fits pcad_asol1.fits
-    punlearn acis_process_events
-    pset acis_process_events infile="acis_evt1.fits.gz[cols -status]"
-    pset acis_process_events outfile=acis_new_evt1.fits
-    pset acis_process_events badpixfile=acis_bpix1.fits.gz
-    pset acis_process_events acaofffile=pcad_asol1.fits
-    pset acis_process_events mtlfile=acis_mtl1.fits.gz
-    pset acis_process_events eventdef=")stdlev1"
-    #pset acis_process_events rand_pix_size=0.5
-    pset acis_process_events pix_adj=RANDOMIZE
-    pset acis_process_events rand_pha=yes
-    pset acis_process_events apply_tgain=yes
-    pset acis_process_events apply_cti=yes
-    acis_process_events
+    # move the original aspect solution out of the primary directory and rename
+    mv 16659/primary/pcadf537654279N001_asol1.fits.gz 16659/pcadf537654279N001_asol1.fits.gz.ORIG
+    cp driftcorr_asol1.fits 16659/primary/pcadf537654279N001_driftcorr_asol1.fits
+    cd 16659
+    chandra_repro
+    cd ..
 
-    punlearn dmcopy
-    dmcopy "acis_new_evt1.fits[EVENTS][grade=0,2,3,4,6,status=0]"  acis_flt_evt1.fits
-
-    punlearn dmcopy
-    dmcopy "acis_flt_evt1.fits[EVENTS][@acis_flt1.fits][cols -phas]" acis_evt2.fits
-
-    punlearn destreak
-    pset destreak infile=acis_evt2.fits
-    pset destreak outfile=acis_dstrk_evt2.fits
-    destreak
+Note that the duration of the event processing (acis_process_events, hrc_process_events)
+task in chandra_repro scales with the number of events and, for the long observations with
+bright sources for which this tool is useful, may take more than 30 minutes to run on a
+modern CPU.
 
 ### Verify the outputs
 
-    pset correct_periscope_drift evtfile=acis_dstrk_evt2.fits
-    pset correct_periscope_drift infile=corr.fits
+    pset correct_periscope_drift evtfile=16659/repro/acisf16659_repro_evt2.fits
+    pset correct_periscope_drift infile=16659/primary/pcadf537654279N001_driftcorr_asol1.fits
     pset correct_periscope_drift outfile=already_fixed.fits
     pset correct_periscope_drift corr_plot_root="already_fixed"
     correct_periscope_drift

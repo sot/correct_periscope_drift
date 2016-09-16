@@ -1,6 +1,6 @@
 infile,f,a,"",,,"input aspect solution file"
 evtfile,f,a,"",,,"event file"
-outfile,f,h,"corr.fits",,,"corrected/output aspect solution file"
+outfile,f,a,"",,,"corrected/output aspect solution file"
 corr_plot_root,f,h,"corr",,,"prefix for correction evaluation plots"
 x,r,a,,1,,"src sky x"
 y,r,a,,1,,"src sky y"
