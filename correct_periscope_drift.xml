@@ -2,8 +2,10 @@
 <!DOCTYPE cxchelptopics SYSTEM "CXCHelp.dtd">
 <cxchelptopics>
   <ENTRY key="correct_periscope_drift" context="tools"
-         refkeywords=""
-         seealsogroups="">
+         refkeywords="aspect solution motion source coordinates astrometry alignment
+         correction temporal drift sub-arcsec sub-pixel subarcsec subpixel thermal
+         periscope alignment psf"
+         seealsogroups="" displayseealsogroups="pixtools asptools">
 
     <SYNOPSIS>
         Correct a Chandra aspect solution for temporal drift calculated from a fit of the
