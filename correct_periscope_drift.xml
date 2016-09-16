@@ -39,13 +39,13 @@
        <QEXAMPLE>
          <SYNTAX>
            <LINE>
-              % correct_periscope_drift \
-infile=pcadf537654279N001_asol1.fits.gz \
-evtfile=acisf16659N001_evt2.fits.gz \
-x=4133.7619994320 \
-y=4078.7477989208 \
-radius=6 \
-outfile=driftcorr_asol1.fits \
+              % correct_periscope_drift 
+infile=pcadf537654279N001_asol1.fits.gz 
+evtfile=acisf16659N001_evt2.fits.gz 
+x=4133.7619994320 
+y=4078.7477989208 
+radius=6 
+outfile=driftcorr_asol1.fits 
 verbose=2
            </LINE>
          </SYNTAX>
