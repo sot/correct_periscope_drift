@@ -60,46 +60,44 @@ Fetch the data for an observation.
 
 For gratings data, obviously only use events around the zeroth order position.
 
-    download_chandra_obsid 16659
+    download_chandra_obsid 17128
 
 ### Select a source
 
 View and select a region to use for the autocorrection. Celldetect is one rough method to view and select a source.
 
     punlearn celldetect
-    celldetect infile=16659/primary/acisf16659N001_evt2.fits.gz outfile=mysrc.fits
+    celldetect infile= 17128/primary/acisf17128N002_evt2.fits.gz outfile=mysrc.fits
     punlearn dmsort
     dmsort mysrc.fits'[SRCLIST]' key=-snr outfile=mysrc_snrsort.fits
     dmlist mysrc_snrsort.fits'[cols net_counts, x, y, snr, r][net_counts > 500]' data | head
 
-
     --------------------------------------------------------------------------------
     Data for Table Block SRCLIST
     --------------------------------------------------------------------------------
+    ROW    NET_COUNTS           POS(X,Y)                         SNR   R[2]
 
-    ROW NET_COUNTS       POS(X,Y)                                 SNR  R[2]
-
-    1   6187.6665039062 (4557.7041829672, 4545.8621727355)
-    72.2447509766 [       10.6039648056         6.1736688614]
-    2   3222.8750       (4133.7619994320, 4078.7477989208)
-    52.1157989502 [        1.8717634678         1.7822588682]
-    3   1616.1666259766 (3451.3598281418, 4158.0214822771)
-    34.1368141174 [       11.2211189270         8.3461980820]
+     1             4730.250 (     4064.8883702839,     4071.8739789965)
+     63.5722618103 [        1.9038963318         1.7280120850]
+     2      1916.0833740234 (     5050.8106140536,     6133.5909474573)
+     21.5115623474 [       98.9364013672        96.6939392090]
+     3      2097.0068359375 (     4743.0030283711,     6043.9606311763)
+     20.2611484528 [       78.0483093262        70.0926284790]
 
 
 We are looking for a high count, high SNR source, relatively close to the optical axis (which for ACIS is
-defined at x,y = 4096.5, 4096.5).  The second source will do.  We select a radius larger
+defined at x,y = 4096.5, 4096.5).  The first source will do.  We select a radius larger
 than the larger reported value of R of the celldetect shape, and view in ds9.
 
-    ds9 16659/primary/acisf16659N001_evt2.fits.gz \
-    -bin about 4133.7619994320 4078.7477989208 \
+    ds9 17128/primary/acisf17128N002_evt2.fits.gz \
+    -bin about 4064.8883702839 4071.8739789965 \
     -scale log \
-    -regions command "circle 4133.7619994320 4078.7477989208 6 # color=red" \
+    -regions command "circle 4064.8883702839  4071.8739789965 # color=red" \
     -zoom 8
 
 ![ds9 screenshot of src](ds9_src.png)
 
-The source looks point-like and is contained within the specified region.
+The source looks point-like and is basically contained within the specified region.
 
 ### Setup the correction tool using the source for reference events for the correction
 
@@ -107,13 +105,14 @@ The source looks point-like and is contained within the specified region.
 
 Set the source for the tool.
 
-    pset correct_periscope_drift x=4133.7619994320 y=4078.7477989208 radius=6
+    pset correct_periscope_drift x=4064.8883702839 y=4071.8739789965 radius=6
 
 Set the other input and output files as desired
 
-    pset correct_periscope_drift infile=16659/primary/pcadf537654279N001_asol1.fits.gz
-    pset correct_periscope_drift evtfile=16659/primary/acisf16659N001_evt2.fits.gz
+    pset correct_periscope_drift infile= 17128/primary/pcadf557756838N002_asol1.fits.gz
+    pset correct_periscope_drift evtfile= 17128/primary/acisf17128N002_evt2.fits.gz
     pset correct_periscope_drift outfile=driftcorr_asol1.fits
+    pset correct_periscope_drift corr_plot_root=demo_corr
 
 ### Run the tool
 
@@ -122,18 +121,44 @@ Set the other input and output files as desired
 The tool will write out an updated aspect solution to 'driftcorr_asol1.fits' as requested
 by the outfile parameter and will save the plots of the fits into the working directory.
 
+    Running: correct_periscope_drift
+       version = 0.1
+    with parameters:
+      infile=17128/primary/pcadf557756838N002_asol1.fits.gz
+      evtfile=17128/primary/acisf17128N002_evt2.fits.gz
+      outfile=driftcorr_asol1.fits
+      verbose=2
+      and ASCDS_INSTALL is /soft/ciao-4.8
+    ------------------------------------------------------------
+    Fitting a line to the data to get reduced stat errors
+    Fitting a polynomial of degree 2 to the data
+    Fitting a line to the data to get reduced stat errors
+    Fitting a polynomial of degree 2 to the data
+    ------------------------------------------------------------
+    Fit results
+        Events show drift range of 0.36 arcsec in yag axis
+        Max absolute correction of 0.21 arcsec for yag axis
+        Events show drift range of 0.02 arcsec in zag axis
+        Max absolute correction of 0.01 arcsec for zag axis
+    ------------------------------------------------------------
+    Writing out corrected aspect solution file to driftcorr_asol1.fits
+        To review fit see correction plots in:
+           demo_corr_fit_yag.png
+           demo_corr_data_yag.png
+           demo_corr_fit_zag.png
+           demo_corr_data_zag.png
+
 ![y-angle fit and binned data](demo_corr_fit_yag.png)
 ![y-angle fit and raw data](demo_corr_data_yag.png)
 ![z-angle fit and binned data](demo_corr_fit_zag.png)
 ![z-angle fit and raw data](demo_corr_data_zag.png)
 
-
 ### Run chandra_repro with the new aspect solution.
 
     # move the original aspect solution out of the primary directory and rename
-    mv 16659/primary/pcadf537654279N001_asol1.fits.gz 16659/pcadf537654279N001_asol1.fits.gz.ORIG
-    cp driftcorr_asol1.fits 16659/primary/pcadf537654279N001_driftcorr_asol1.fits
-    cd 16659
+    mv 17128/primary/pcadf557756838N002_asol1.fits.gz 17128/pcadf557756838N002_asol1.fits.gz.ORIG
+    cp driftcorr_asol1.fits 17128/primary/pcadf557756838_driftcorr_asol1.fits
+    cd 17128
     chandra_repro
     cd ..
 
@@ -144,11 +169,39 @@ modern CPU.
 
 ### Verify the outputs
 
-    pset correct_periscope_drift evtfile=16659/repro/acisf16659_repro_evt2.fits
-    pset correct_periscope_drift infile=16659/primary/pcadf537654279N001_driftcorr_asol1.fits
+    pset correct_periscope_drift evtfile= 17128/repro/acisf17128_repro_evt2.fits
+    pset correct_periscope_drift infile= 17128/primary/pcadf557756838_driftcorr_asol1.fits
     pset correct_periscope_drift outfile=already_fixed.fits
     pset correct_periscope_drift corr_plot_root="already_fixed"
     correct_periscope_drift
+
+    Running: correct_periscope_drift
+      version = 0.1
+    with parameters:
+      infile=17128/primary/pcadf557756838_driftcorr_asol1.fits
+      evtfile=17128/repro/acisf17128_repro_evt2.fits
+      outfile=already_fixed.fits
+      verbose=2
+      and ASCDS_INSTALL is /soft/ciao-4.8
+    ------------------------------------------------------------
+    Fitting a line to the data to get reduced stat errors
+    Fitting a polynomial of degree 2 to the data
+    Fitting a line to the data to get reduced stat errors
+    Fitting a polynomial of degree 2 to the data
+    ------------------------------------------------------------
+    Fit results
+        Events show drift range of 0.00 arcsec in yag axis
+        Max absolute correction of 0.00 arcsec for yag axis
+        Events show drift range of 0.00 arcsec in zag axis
+        Max absolute correction of 0.00 arcsec for zag axis
+    ------------------------------------------------------------
+    Writing out corrected aspect solution file to already_fixed.fits
+            To review fit see correction plots in:
+                   already_fixed_fit_yag.png
+                   already_fixed_data_yag.png
+                   already_fixed_fit_zag.png
+                   already_fixed_data_zag.png
+
 
 ![y-angle fit and binned data](already_fixed_fit_yag.png)
 ![y-angle fit and raw data](already_fixed_data_yag.png)
