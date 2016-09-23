@@ -10,7 +10,6 @@ import numpy as np
 import pytest
 import tempfile
 
-
 def equatorial2transform(ra, dec, roll):
     """Construct the transform/rotation matrix from RA,Dec,Roll (given in degrees)
     :returns: transform matrix
@@ -206,15 +205,33 @@ def test_process(src_info):
         bash("chandra_repro indir={}/ outdir={}/repro_evt1 verbose=1".format(obsid, obsid),
              env=ciaoenv)
 
+        evtfile_from_evt2 = glob("{}/repro_evt2/*evt2.fits*".format(obsid))[0]
+        evtfile_from_evt1 = glob("{}/repro_evt1/*evt2.fits*".format(obsid))[0]
+
+        # Check offsets of sky x and sky y from mean values to see if things are better
+        evt = Table.read("{}_orig_src_evt1.fits.gz".format(obsid))
+        bins_skyx = time_bins(evt['time'], evt['x'], nbins=10)
+        bins_skyy = time_bins(evt['time'], evt['y'], nbins=10)
+        corr_evt2 = Table.read(evtfile_from_evt2)
+        bins_corr_skyx = time_bins(corr_evt2['time'], corr_evt2['x'], nbins=10)
+        bins_corr_skyy = time_bins(corr_evt2['time'], corr_evt2['y'], nbins=10)
+        # check that the corrected binned maxes aren't more than half a pixel worse than
+        # the originals.
+        assert np.max(np.abs(bins_corr_skyx[1] - np.mean(corr_evt2['x']))) < np.max(np.abs(bins_skyx[1] - np.mean(evt['x']))) + 0.5
+        assert np.max(np.abs(bins_corr_skyy[1] - np.mean(corr_evt2['y']))) < np.max(np.abs(bins_skyy[1] - np.mean(evt['y']))) + 0.5
+
+
         # Extract RA,Dec,Time from the event files
         bash('dmcopy {evt2file}"[(x,y)=circle({x},{y},{radius})][cols ra,dec,time]" {obsid}_orig_evt2_radectime.fits clobber+'.format(
                 evt2file=evt2file, x=x, y=y, radius=radius, obsid=obsid), env=ciaoenv)
-        evtfile_from_evt2 = glob("{}/repro_evt2/*evt2.fits*".format(obsid))[0]
+
         bash('dmcopy {evt2file}"[(x,y)=circle({x},{y},{radius})][cols ra,dec,time]" {obsid}_fixed_from_evt2_radectime.fits clobber+'.format(
                 evt2file=evtfile_from_evt2, x=x, y=y, radius=radius, obsid=obsid), env=ciaoenv)
-        evtfile_from_evt1 = glob("{}/repro_evt1/*evt2.fits*".format(obsid))[0]
+
         bash('dmcopy {evt2file}"[(x,y)=circle({x},{y},{radius})][cols ra,dec,time]" {obsid}_fixed_from_evt1_radectime.fits clobber+'.format(
                 evt2file=evtfile_from_evt1, x=x, y=y, radius=radius, obsid=obsid), env=ciaoenv)
+
+
 
         # Read those files
         uncorr_data = Table.read("{}_orig_evt2_radectime.fits".format(obsid))
