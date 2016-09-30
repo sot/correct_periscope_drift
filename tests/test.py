@@ -137,16 +137,18 @@ def max_offset(times, ras, decs, ra_pnt, dec_pnt, roll_pnt):
     return np.max(np.abs(bins_yag[1] - np.mean(yag))), np.max(np.abs(bins_zag[1] - np.mean(zag)))
 
 
-def cpd(asol, evtfile, x, y, radius, out):
+def cpd(asol, evtfile, x, y, radius, poly_degree, out):
     """
     Run the correct periscope drift tool.
     """
     bash("""./correct_periscope_drift infile= {asol} \
 evtfile= {evtfile} \
 x={x} y={y} radius={radius} \
+corr_poly_degree={poly_degree} \
 outfile= {out}_asol1.fits \
 corr_plot_root= {out} \
-clobber+""".format(testdir=TESTDIR, evtfile=evtfile, asol=asol, y=y, x=x, radius=radius, out=out),
+clobber+""".format(testdir=TESTDIR, evtfile=evtfile, asol=asol,
+                   y=y, x=x, radius=radius, poly_degree=poly_degree, out=out),
          env=ciaoenv)
 
 
@@ -154,9 +156,16 @@ ciaoenv = Ska.Shell.getenv('source /soft/ciao/bin/ciao.sh')
 
 TESTDIR = os.path.abspath(os.path.dirname(__file__))
 
-obsids = [{'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6},
-          {'obsid': 9926, 'x': 4103.6, 'y': 4062.3, 'radius': 6},
-          {'obsid': 10228, 'x': 32888.17, 'y': 32710.78, 'radius': 20}]
+obsids = [{'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 1},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 2},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 3},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 4},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 5},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 6},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 7},
+          {'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6, 'poly_degree': 8},
+          {'obsid': 9926, 'x': 4103.6, 'y': 4062.3, 'radius': 6, 'poly_degree': 2},
+          {'obsid': 10228, 'x': 32888.17, 'y': 32710.78, 'radius': 20, 'poly_degree': 2}]
 
 
 @pytest.mark.parametrize("src_info", obsids)
@@ -174,6 +183,7 @@ def test_process(src_info):
         x = src_info['x']
         y = src_info['y']
         radius = src_info['radius']
+        poly_degree = src_info['poly_degree']
 
         bash("cp {}/correct_periscope_drift.par .".format(TESTDIR))
         bash("ln -s {}/../correct_periscope_drift.py correct_periscope_drift".format(TESTDIR))
@@ -184,8 +194,8 @@ def test_process(src_info):
         evt2file = glob("{}/primary/*evt2*fits*".format(obsid))[0]
         evt1file = glob("{}/secondary/*evt1*fits*".format(obsid))[0]
 
-        cpd(asol, evt2file, x, y, radius, 'cpd_from_evt2')
-        cpd(asol, evt1file, x, y, radius, 'cpd_from_evt1')
+        cpd(asol, evt2file, x, y, radius, poly_degree, 'cpd_from_evt2')
+        cpd(asol, evt1file, x, y, radius, poly_degree, 'cpd_from_evt1')
 
         # reduce the evt1 file to just the source region in place
         bash("""dmcopy {evt1file}"[(x,y)=circle({x}, {y}, {radius})]" {obsid}_orig_src_evt1.fits clobber+""".format(evt1file=evt1file, x=x, y=y, radius=radius, obsid=obsid),
@@ -200,7 +210,7 @@ def test_process(src_info):
              env=ciaoenv)
 
         # reprocess with the aspect solution from cpd via evt1 fit
-        bash("rm {}/primary/cpd_from_evt2_asol1.fits".format(obsid))
+        bash("rm -f {}/primary/cpd_from_evt2_asol1.fits".format(obsid))
         bash("cp cpd_from_evt1_asol1.fits {}/primary/".format(obsid))
         bash("chandra_repro indir={}/ outdir={}/repro_evt1 verbose=1".format(obsid, obsid),
              env=ciaoenv)
@@ -297,6 +307,7 @@ def test_fix_introduced_offset():
     x = 4133.76
     y = 4078.74
     radius = 6
+    poly_degree = 2
     bash("download_chandra_obsid {}".format(obsid), env=ciaoenv)
 
     asol = glob("{}/primary/*asol1.fits*".format(obsid))[0]
@@ -323,9 +334,9 @@ def test_fix_introduced_offset():
 
     # Construct an aspect solution with artificially bad offsets
     # first, link to the version of the tool that just introduces bad offsets
-    bash("rm correct_periscope_drift")
+    bash("rm -f correct_periscope_drift")
     bash("ln -s {}/introduce_bad_offset.py correct_periscope_drift".format(TESTDIR))
-    cpd(asol, evt1_src_file, x, y, radius, 'bad_offsets')
+    cpd(asol, evt1_src_file, x, y, radius, poly_degree, 'bad_offsets')
     bad_asol = "bad_offsets_asol1.fits"
 
     # Apply those offsets to the source file to make evt1 with artificial "jet"
@@ -340,11 +351,11 @@ def test_fix_introduced_offset():
 
     # Rerun the correction tool on this bad file with the bad aspect solution file.
     # First link to the right/good version of the tool
-    bash("rm correct_periscope_drift")
+    bash("rm -f correct_periscope_drift")
     bash("ln -s {}/../correct_periscope_drift.py correct_periscope_drift".format(TESTDIR))
     # Note a larger radius is needed to get all the events for this drifted data
     cpd(asol=bad_asol, evtfile="{}_bad_offsets_evt1.fits".format(obsid),
-        x=x, y=y, radius=40, out='fixed_offsets')
+        x=x, y=y, radius=40, poly_degree=poly_degree, out='fixed_offsets')
 
 
     # Apply those offsets to the source file to correct artificial "jet"
