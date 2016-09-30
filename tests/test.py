@@ -152,7 +152,7 @@ clobber+""".format(testdir=TESTDIR, evtfile=evtfile, asol=asol, y=y, x=x, radius
 
 ciaoenv = Ska.Shell.getenv('source /soft/ciao/bin/ciao.sh')
 
-TESTDIR = os.path.abspath(".")
+TESTDIR = os.path.abspath(os.path.dirname(__file__))
 
 obsids = [{'obsid': 17128, 'x': 4064.88, 'y': 4071.87, 'radius': 6},
           {'obsid': 9926, 'x': 4103.6, 'y': 4062.3, 'radius': 6},
