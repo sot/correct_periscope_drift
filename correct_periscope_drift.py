@@ -25,7 +25,7 @@
 """
 
 TOOLNAME = "correct_periscope_drift"
-VERSION = "0.1"
+VERSION = "0.2"
 
 # import standard python modules as required
 import os
