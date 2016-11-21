@@ -377,7 +377,7 @@ def main(opt):
     wcs = events.get_transform("eqpos")
     evt_x = events.get_column("x").values
     evt_y = events.get_column("y").values
-    rd = wcs.apply(zip(evt_x, evt_y))
+    rd = wcs.apply(np.column_stack([evt_x, evt_y]))
     evt_ra = rd[:, 0]
     evt_dec = rd[:, 1]
     evt_times = events.get_column('Time').values

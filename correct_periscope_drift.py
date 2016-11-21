@@ -25,7 +25,7 @@
 """
 
 TOOLNAME = "correct_periscope_drift"
-VERSION = "0.1"
+VERSION = "0.2"
 
 # import standard python modules as required
 import os
@@ -46,6 +46,7 @@ import numpy as np
 
 from ciao_contrib.logger_wrapper import initialize_logger, make_verbose_level, set_verbosity, handle_ciao_errors
 from ciao_contrib.param_wrapper import open_param_file
+from ciao_contrib.runtool import add_tool_history
 from ciao_contrib._tools.fileio import outfile_clobber_checks
 import pycrates
 from pychips import (add_curve, print_window, set_plot_xlabel, set_plot_ylabel, clear_plot,
@@ -95,8 +96,7 @@ def process_command_line(argv):
     # Parameters should be queried in the same order
     # as the parameter file
     #
-    mypars = {'progname': pinfo['progname'],
-              'parname': pinfo['parname']}
+    mypars = {}
 
     for stringpar in ['infile', 'evtfile',
                       'outfile', 'corr_plot_root']:
@@ -109,7 +109,7 @@ def process_command_line(argv):
 
     mypars['corr_poly_degree'] = pio.pgeti(fp, "corr_poly_degree")
 
-    clobber = pio.pgetb(fp, "clobber")
+    clobber = pio.pgetstr(fp, "clobber")
     verbose = pio.pgeti(fp, "verbose")
 
     # We close the parameter file here; if you need to write
@@ -143,7 +143,7 @@ def process_command_line(argv):
 # depends on the tool what should be used.
 #
 def display_start_info(opts):
-    v1("Running: {0}".format(opts["progname"]))
+    v1("Running: {0}".format(TOOLNAME))
     v2("  version = {0}".format(VERSION))
     v2("with parameters:")
     v1("  infile={0}".format(opts["infile"]))
@@ -370,7 +370,7 @@ def main(opt):
     wcs = events.get_transform("eqpos")
     evt_x = events.get_column("x").values
     evt_y = events.get_column("y").values
-    rd = wcs.apply(zip(evt_x, evt_y))
+    rd = wcs.apply(np.column_stack([evt_x, evt_y]))
     evt_ra = rd[:, 0]
     evt_dec = rd[:, 1]
     evt_times = events.get_column('Time').values
@@ -416,7 +416,7 @@ def main(opt):
         set_plot_ylabel("Position offset from mean, {} (arcsec)".format(ax))
         set_plot_title("Fit of {} data (with time-binned event offsets)".format(ax))
         fit_plot = "{}_fit_{}.png".format(opt['corr_plot_root'], ax)
-        if os.path.exists(fit_plot) and opt['clobber']:
+        if os.path.exists(fit_plot) and opt['clobber'] == 'yes':
             os.unlink(fit_plot)
         plot_list.append(fit_plot)
         print_window(fit_plot)
@@ -425,7 +425,7 @@ def main(opt):
         data_plot = "{}_data_{}.png".format(opt['corr_plot_root'], ax)
         ui.get_data_plot_prefs()['yerrorbars'] = False
         ui.plot_fit(data_id)
-        if os.path.exists(data_plot) and opt['clobber']:
+        if os.path.exists(data_plot) and opt['clobber'] == 'yes':
             os.unlink(data_plot)
         # set minimum limit on data plot in arcsecs and set this explicitly as a symmetric limit
         data_ymax = max(2.0, np.max(np.abs(fit_data)) + .2)
@@ -481,6 +481,9 @@ def main(opt):
 
     # Actually write out the new aspect solution file
     asol.write(opt['outfile'], clobber=opt['clobber'])
+
+    # Add history
+    add_tool_history(opt['outfile'], TOOLNAME, params=opt, toolversion=VERSION)
 
 
 if __name__ == "__main__":
